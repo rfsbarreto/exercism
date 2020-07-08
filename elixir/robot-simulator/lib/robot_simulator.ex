@@ -1,37 +1,45 @@
 defmodule RobotSimulator do
   defstruct direction: :north, position: {0, 0}
 
+  @doc """
+  Process movement from a given robot direction/position and a instruction movement
+  """
   @spec process_movement(robot :: any, movement :: String.t()) :: any
-  def process_movement(robot, "L") do
-    case robot.direction do
-      :north -> create(:west, robot.position)
-      :west -> create(:south, robot.position)
-      :south -> create(:east, robot.position)
-      _ -> create(:north, robot.position)
-    end
-  end
+  def process_movement(%RobotSimulator{direction: :north} = robot, "L"),
+    do: %RobotSimulator{robot | direction: :west}
 
-  def process_movement(robot, "R") do
-    case robot.direction do
-      :north -> create(:east, robot.position)
-      :west -> create(:north, robot.position)
-      :south -> create(:west, robot.position)
-      _ -> create(:south, robot.position)
-    end
-  end
+  def process_movement(%RobotSimulator{direction: :west} = robot, "L"),
+    do: %RobotSimulator{robot | direction: :south}
 
-  def process_movement(%RobotSimulator{direction: direction, position: {x, y}}, "A") do
-    new_position =
-      case direction do
-        :north -> {x, y + 1}
-        :west -> {x - 1, y}
-        :south -> {x, y - 1}
-        _ -> {x + 1, y}
-      end
+  def process_movement(%RobotSimulator{direction: :south} = robot, "L"),
+    do: %RobotSimulator{robot | direction: :east}
 
-    direction
-    |> create(new_position)
-  end
+  def process_movement(%RobotSimulator{direction: :east} = robot, "L"),
+    do: %RobotSimulator{robot | direction: :north}
+
+  def process_movement(%RobotSimulator{direction: :north} = robot, "R"),
+    do: %RobotSimulator{robot | direction: :east}
+
+  def process_movement(%RobotSimulator{direction: :west} = robot, "R"),
+    do: %RobotSimulator{robot | direction: :north}
+
+  def process_movement(%RobotSimulator{direction: :south} = robot, "R"),
+    do: %RobotSimulator{robot | direction: :west}
+
+  def process_movement(%RobotSimulator{direction: :east} = robot, "R"),
+    do: %RobotSimulator{robot | direction: :south}
+
+  def process_movement(%RobotSimulator{direction: :north, position: {x, y}} = robot, "A"),
+    do: %RobotSimulator{robot | position: {x, y + 1}}
+
+  def process_movement(%RobotSimulator{direction: :west, position: {x, y}} = robot, "A"),
+    do: %RobotSimulator{robot | position: {x - 1, y}}
+
+  def process_movement(%RobotSimulator{direction: :south, position: {x, y}} = robot, "A"),
+    do: %RobotSimulator{robot | position: {x, y - 1}}
+
+  def process_movement(%RobotSimulator{direction: :east, position: {x, y}} = robot, "A"),
+    do: %RobotSimulator{robot | position: {x + 1, y}}
 
   @doc """
   Create a Robot Simulator given an initial direction and position.
@@ -90,11 +98,6 @@ defmodule RobotSimulator do
   @spec direction(robot :: any) :: atom
   def direction(robot) do
     robot.direction
-  end
-
-  @spec process_instructions(String.t()) :: True
-  def process_instructions(instructions) do
-    True
   end
 
   @doc """
